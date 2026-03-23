@@ -1,8 +1,38 @@
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.core.paginator import Paginator
+from django.urls import reverse
+
+from .forms import ProfileForm
 from .models import User, Post, Comment, Like, Follower, Blocked
-from .forms import UserForm, PostForm, CommentForm
+
+def front_page(request):
+  return
+
+def sign_up(request):
+  if request.method == "POST":
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+      user = form.save()
+      login(request, user)
+      return redirect(reverse("update_profile"))
+  else:
+    form = UserCreationForm()
+  return render(request, "sign_up.html", {"form": form})
+  
+def update_profile(request):
+  if request.method == "POST":
+    profile_form = ProfileForm(request.POST, request.FILES, instance = request.user.profile)
+    if profile_form.is_valid():
+      profile_form.save()
+      print("SAVED")
+  else:
+    profile_form = ProfileForm(instance=request.user.profile)
+  return render(request, 'account.html', {'form': profile_form, "pfp": request.user.profile.profile_pic})
+
+"""
 
 def front_page(request):
   return create_account(request)
@@ -50,3 +80,5 @@ def like_post(request, post_id):
 def get_user(request, user_id):
   user = User.objects.get(id=user_id)
   return render(request, "user_page.html", user=user)
+
+"""

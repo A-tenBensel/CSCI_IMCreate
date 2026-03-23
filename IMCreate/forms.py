@@ -1,18 +1,25 @@
 from django import forms
-from .models import User, Post, Comment
-from django.contrib.auth.forms import UserCreationForm
+from .models import Post, Comment, Profile
+from django.contrib.auth.models import User
 
-class UserForm(UserCreationForm):
-  display_name = forms.CharField()
-  about_me = forms.CharField(widget=forms.Textarea)
+class UserCreateForm(forms.ModelForm):
   class Meta:
     model = User
-    fields = ['profile_pic', 'username', 'password1', 'password2', 'display_name', 'about_me']
-    widgets = {'password': forms.PasswordInput()}
+    fields = ['username', 'password']
+
+class ProfileForm(forms.ModelForm):
+  class Meta:
+    model = Profile
+    fields = ['about_me', 'profile_pic']
+    widgets = {'profile_pic': forms.FileInput()}
+
 class PostForm(forms.ModelForm):
   class Meta:
     model = Post
-    fields = ['title', 'media', 'description', 'tags']
+    fields = ['title', 'description', 'tags']
+
+class PostImageForm(forms.ModelForm):
+  images = forms.ImageField(widget=forms.ClearableFileInput(attrs={"allow_multiple_selected": True}))
 
 class CommentForm(forms.ModelForm):
   class Meta:

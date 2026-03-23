@@ -13,5 +13,7 @@ pip install django-taggit django-resized
 
 How to run:
 ```
+python manage.py makemigrations
+python manage.py migrate
 python manage.py runserver [IP address]
 ```

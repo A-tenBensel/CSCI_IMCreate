@@ -3,12 +3,13 @@
 
 {% block content %}
 <h1>Create User Account</h1>
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
   {% csrf_token %}
-  {{ form.as_p }}
+  <p>About Me: {{ form.about_me }}</p>
+  {% if pfp %}
+  <img src="{{ pfp.url }}" alt="No profile pic">
+  {% endif %}
+  <p>Profile Pic: {{ form.profile_pic }}</p>
   <button type="submit">Save User</button>
 </form>
-{% if success %}
-<p>YIBBEEE</p>
-{% endif %}
 {% endblock %}

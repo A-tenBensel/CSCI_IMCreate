@@ -1,61 +1,51 @@
 from django.db import models
-from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django_resized import ResizedImageField
 from taggit.managers import TaggableManager
 from PIL import Image
+import uuid
+from django.conf import settings
 
-#have to download + include 'taggit' in the INSTALLED_APPS
-#pillow -> for image size validations
-"""
-TODO: in settings.py
-Caps the file upload automatically
+def img_name(instance, filename):
+  print("IMAGE")
+  try:
+    directory = instance.user.id
+  except AttributeError:
+    directory = instance.post.user.id
+  except Exception as e:
+    print(f"ERRORRRR {e}")
+    directory = "ERROR"
+  return f"{directory}/{uuid.uuid4().hex}.jpeg"
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
-"""
+# def img_file_at(directory):
+#   def img_name(instance, filename):
+#     return f"{directory}/{uuid.uuid4().hex}.jpeg"
+#   return img_name
 
-profiles = "profiles/"
-posts = "posts/"
+class Profile(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE)
+  about_me = models.TextField(max_length = 1000, blank = True)
+  profile_pic = ResizedImageField(size=[150,150], crop=['top','left'], quality=50, upload_to=img_name,force_format="JPEG", blank=True, null=True)
 
-def validate_pfp(image):
-  img = Image.open(image)
-  if img.size != (400,400):
-    raise ValidationError("Image must be 400x400.")
+  def save(self, *args, **kwargs):
+    try:
+      old = Profile.objects.get(pk=self.pk)
+    except Profile.DoesNotExist:
+      old = None
+    super().save(*args, **kwargs)
+    if old and old.profile_pic and old.profile_pic != self.profile_pic:
+      old.profile_pic.delete(save=False)
 
-class UserManager(BaseUserManager):
-  """
-  TODO: profile picture here?
-  """
-  def create_user(self, username, password=None, **extra_fields):
-    if not username:
-      raise ValueError("Username required.")
-    user = self.model(username=username, **extra_fields)
-    user.set_password(password)
-    user.save(using=self._db)
-    return user
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+  if created:
+    Profile.objects.create(user=instance)
 
-#TODO: edit AUTH_USER_MODEL to be -> "app.User" in settings.py
-class User(AbstractBaseUser, PermissionsMixin):
-  """
-  
-  TODO: add default profile_pic, image compression.
-
-  The data for a user.
-
-  Attributes:
-  username: User's log-in username.
-  display_name: User's display name.
-  about_me: User's about me.
-  profile_pic: User's profile pic.
-  date: Date User joined.
-  """
-  username = models.CharField(max_length = 50, unique = True)
-  display_name = models.CharField(max_length = 50)
-  about_me = models.TextField(max_length = 1000)
-  profile_pic = models.ImageField(upload_to = profiles, validators = [validate_pfp])
-  date = models.DateField(auto_now_add = True)
-  object = UserManager()
-  USERNAME_FIELD = 'username'
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+  instance.profile.save()
 
 class Post(models.Model):
   """
@@ -69,19 +59,20 @@ class Post(models.Model):
   upload_date: Post upload date.
   edit_date: Last edit date.
   title: User provided title.
-  media: User provided media.
   description: user provided description.
   tags: User provided tags.
-  slug: Unique slug for url.
   """
-  user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+  user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts", on_delete=models.CASCADE)
   upload_date = models.DateTimeField(auto_now_add = True)
   edit_date = models.DateTimeField(auto_now = True)
   title = models.CharField(max_length = 255)
-  media = models.FileField(upload_to = posts)
   description = models.TextField(max_length = 1000)
   tags = TaggableManager()
-  slug = models.SlugField(unique = True)
+  # media = models.FileField(upload_to = posts)
+
+class Post_Image(models.Model):
+  post = models.ForeignKey(Post, related_name="images", on_delete=models.CASCADE)
+  image = ResizedImageField(size=[480,None],quality=50,upload_to=img_name, force_format="JPEG")
 
 class Comment(models.Model):
   """
