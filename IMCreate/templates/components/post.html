@@ -87,16 +87,16 @@
 </style>
 <article class="post_container">
   <div class="post_header">
-    <a href="{% url 'get_user' 1 %}" class="user">
-        <img class="user_profile" src="{{ post.user.profile_pic }}" alt="{{ post.user.username }}'s profile picture">
+    <a href="{% url 'front_page' %}" class="user">
+        <img class="user_profile" src="{{ post.user.profile.profile_pic.url }}" alt="{{ post.user.username }}'s profile picture">
         <div>{{ post.user.username }}</div>
     </a>
     <div class="user_interactions">
-      <form class="post_form" method="POST" action="{% url 'follow_user' 1 %}">
+      <form class="post_form" method="POST" action="{% url 'front_page' %}">
         {% csrf_token %}
         <button type="submit">Follow</button>
       </form>
-      <form class="post_form" method="POST" action="{% url 'block_user' 1 %}">
+      <form class="post_form" method="POST" action="{% url 'front_page' %}">
         {% csrf_token %}
         <button type="submit">Block</button>
       </form>
@@ -104,11 +104,13 @@
   </div>
 
   <div>
-    <a href="{% url 'get_post' 'a' %}" class="post_link">
-      <img class="post_image" src="{{ post.media }}" alt="{{ post.title }} media">
+    <a href="{% url 'front_page' %}" class="post_link">
+      {% for image in post.images.all %}
+      <img class="post_image" src="{{ image.image.url }}" alt="{{ post.title }} media">
+      {% endfor %}
     </a>
     <div class="post_interactions">
-      <form method="POST" action="{% url 'like_post' 1 %}">
+      <form method="POST" action="{% url 'front_page' %}">
         {% csrf_token %}
         <button type="submit">
           <svg viewBox="0 0 490 490" height="20px" width="auto">
@@ -116,7 +118,7 @@
         </svg>
         </button>
       </form>
-      <form method="POST" action="{% url 'get_post' 'a' %}">
+      <form method="POST" action="{% url 'front_page' %}">
         {% csrf_token %}
         <button type="submit">
           <svg viewBox="0 0 24 24" height="20px" width="auto">
@@ -125,7 +127,7 @@
         </button>
       </form>
     </div>
-    <a href="{% url 'get_post' 'a' %}" class="post_link">
+    <a href="{% url 'front_page' %}" class="post_link">
       <div><b>{{ post.title }}</b></div>
       <div class= "post_desc">{{ post.description }}</div>
     </a>
