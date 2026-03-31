@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
 from .forms.forms import PostForm
 from .forms.render import RenderForm
-from .models import Post_Image
+from apps.posts.models import Post_Image
 
 class RenderUserCreationForm(RenderForm):
   def __init__(self, request, *args, **kwargs):

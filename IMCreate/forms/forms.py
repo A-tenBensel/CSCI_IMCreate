@@ -1,5 +1,7 @@
 from django import forms
-from ..models import Post, Comment, Profile
+from apps.comments.models import Comment
+from apps.posts.models import Post
+from apps.users.models import Profile
 from django.contrib.auth.models import User
 from .fields import MultipleFileField
 

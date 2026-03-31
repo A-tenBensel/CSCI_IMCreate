@@ -48,6 +48,10 @@ INSTALLED_APPS = [
     'taggit',
     'django_resized',
     'IMCreate',
+    'apps.comments.apps.CommentsConfig',
+    'apps.posts.apps.PostsConfig',
+    'apps.social.apps.SocialConfig',
+    'apps.users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
