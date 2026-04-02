@@ -15,6 +15,7 @@ class ProfileEditView(UserPassesTestMixin, UpdateView):
   model = Profile
   form_class = ProfileForm
   template_name = 'profile_edit.html'
+  success_url = reverse_lazy('view_profile')
   # slug_url_kwarg = "user_slug"
   login_url = "login_user"
   redirect_field_name = None
