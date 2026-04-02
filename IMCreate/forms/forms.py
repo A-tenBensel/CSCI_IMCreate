@@ -4,6 +4,7 @@ from apps.posts.models import Post
 from apps.users.models import Profile
 from django.contrib.auth.models import User
 from .fields import MultipleFileField
+from taggit.forms import TagField, TagWidget
 
 class UserCreateForm(forms.ModelForm):
   class Meta:
@@ -18,6 +19,7 @@ class ProfileForm(forms.ModelForm):
 
 class PostForm(forms.ModelForm):
   images = MultipleFileField()
+  tags = TagField(required=False, widget=TagWidget())
   class Meta:
     model = Post
     fields = ['title', 'description', 'tags']
