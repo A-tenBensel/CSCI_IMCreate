@@ -5,10 +5,8 @@ An image hosting social media-like website.
 
 ## Getting Started
 Necessary packages:
-- `django-taggit`
-- `django-resized`
 ```
-pip install django-taggit django-resized
+pip install -r requirements.txt
 ```
 
 How to run:
@@ -17,8 +15,8 @@ python manage.py migrate
 python manage.py runserver [IP address:Port]
 ```
 
-When editing:
+When editing app models:
 ```
-python manage.py makemigrations comments/posts/social/users
+python manage.py makemigrations [comments/posts/social/users]
 python manage.py migrate
 ```
