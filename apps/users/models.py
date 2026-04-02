@@ -4,12 +4,19 @@ from django_resized import ResizedImageField
 from IMCreate.image_upload import pfp_path
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from autoslug import AutoSlugField
+from django.urls import reverse
+
 
 class Profile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
   display_name = models.CharField(max_length=150, blank=True)
   about_me = models.TextField(max_length = 1000, blank = True)
-  profile_pic = ResizedImageField(size=[150,150], crop=['top','left'], quality=50, upload_to=pfp_path,force_format="JPEG", blank=True, null=True)
+  profile_pic = ResizedImageField(size=[150,150], crop=['top','left'], quality=50, upload_to=pfp_path,force_format="JPEG", default="default_pfp.jpeg")
+  slug = AutoSlugField(populate_from='display_name', unique=True)
+
+  def get_absolute_url(self):
+    return reverse("user_account", kwargs={"user_slug": self.slug})
 
   def save(self, *args, **kwargs):
     try:
