@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}Home Page{% endblock %}
 {% block content %}
-    <form method="POST">
-        {% csrf_token %} {{ form.as_p }}
+    <form method="GET">
+        {{ form.as_p }}
         <div>
             <label for="Tags">Tags</label>
             <input type="text" id="tags" name="tags" value="{{ tags_query }}"/>
         </div>
         <button type="submit">Search</button>
-            {% for post in posts %}
-                {% include "components/post.html" %}
-            {% endfor %}
-    </form>
+      </form>
+      {% for post in posts %}
+          {% include "components/post.html" with post=post %}
+      {% endfor %}
 {% endblock %}

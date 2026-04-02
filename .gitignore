@@ -2,6 +2,9 @@
 __pycache__/
 db.sqlite3
 .env
-media/
+media/*
+!default_pfp.jpeg
 staticfiles/
+**/migrations/**
 sites-available-djangoproject*
+!__init__.py
