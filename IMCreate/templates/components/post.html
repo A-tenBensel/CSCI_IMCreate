@@ -88,7 +88,9 @@
 <article class="post_container">
   <div class="post_header">
     <a href="{% url 'front_page' %}" class="user">
+      {% if post.user.profile.profile_pic %}
         <img class="user_profile" src="{{ post.user.profile.profile_pic.url }}" alt="{{ post.user.username }}'s profile picture">
+        {% endif %}
         <div>{{ post.user.username }}</div>
     </a>
     <div class="user_interactions">
