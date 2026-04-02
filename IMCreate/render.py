@@ -33,7 +33,8 @@ class RenderPostForm(RenderForm):
   def save(self):
     post = self.form.save(commit=False)
     post.user = self.request.user
-    post.save()
+    post.save() 
+    self.form.save_m2m()
     images = self.form.cleaned_data['images']
     for image in images:
       Post_Image.objects.create(post=post,image=image)
