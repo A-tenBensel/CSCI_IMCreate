@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'components/form.html' with form=form submit_key=submit_key %}
+<a href="{% url 'sign_up' %}"><button>Create Account</button></a>
+{% endblock %}

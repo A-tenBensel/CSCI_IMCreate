@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>{{ profile.display_name }}</p>
+<p>{{ profile.about_me }}</p>
+{% if profile.profile_pic %}
+<img src="{{ profile.profile_pic.url }}">
+{% for post in profile.user.posts.all %}
+{% include 'components/post.html' with post=post %}
+{% endfor %}
+{% endif %}
+{% endblock %}

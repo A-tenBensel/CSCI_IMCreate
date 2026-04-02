@@ -28,7 +28,7 @@ DEBUG = True
 """
 
 TODO:
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = [".[REGION].compute.amazonaws.com"]
 
 """
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'taggit',
     'django_resized',
+    'autoslug',
     'IMCreate',
     'apps.comments.apps.CommentsConfig',
     'apps.posts.apps.PostsConfig',
