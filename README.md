@@ -20,3 +20,4 @@ When editing app models:
 python manage.py makemigrations [comments/posts/social/users]
 python manage.py migrate
 ```
+
