@@ -40,7 +40,7 @@ class Blocked(models.Model):
     blocked_user: The account that is blocked.
     blocker: The account that did the blocking.
     """
-    blocker = models.ForeignKey(User, on_delete = models.CASCADE, related_name='blocker')
-    blocked_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blocked')
+    blocker = models.ForeignKey(User, on_delete = models.CASCADE, related_name='blocks')
+    blocked_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blockers')
     class Meta:
       constraints = [models.UniqueConstraint(fields=['blocker', "blocked_user"], name = 'unique_block')]

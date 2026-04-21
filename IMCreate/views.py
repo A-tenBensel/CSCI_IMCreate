@@ -2,7 +2,7 @@ from django.contrib.auth import login
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from apps.posts.models import Post
-from apps.social.models import Follower
+from apps.social.models import Follower, Blocked
 
 def front_page(request):
   tags = request.GET.get("tags","").strip()
@@ -13,9 +13,12 @@ def front_page(request):
 
   else:
     posts = Post.objects.all()
-  
+
   posts = posts.order_by("upload_date")
   if request.user.is_authenticated:
+    blocked_accounts = request.user.blocks.all()
+    for blocked in blocked_accounts:
+      posts = posts.exclude(user=blocked.blocked_user)
     following = request.user.following.all()
     is_following = [following.filter(following=post.user).exists() for post in posts]
   else:

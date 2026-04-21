@@ -10,7 +10,7 @@ from IMCreate.forms.forms import ProfileForm
 from IMCreate.forms.render import RenderForm
 from IMCreate.render import RenderUserCreationForm, RenderAuthenticationForm
 from .models import Profile
-from apps.social.models import Follower
+from apps.social.models import Follower, Blocked
 
 class ProfileEditView(UserPassesTestMixin, UpdateView):
   model = Profile
@@ -96,5 +96,14 @@ def follow_user(request, profile_slug):
     follower = request.user
     Follower.objects.create(following=following.user, follower=follower, notifications = True)
     return redirect(following.slug)
+  except:
+    return redirect("sign_up")
+  
+def block_user(request, profile_slug):
+  try:
+    blocking = Profile.objects.get(slug=profile_slug)
+    blocker = request.user
+    Blocked.objects.create(blocked_user=blocking.user, blocker=blocker)
+    return redirect(blocking.slug)
   except:
     return redirect("sign_up")

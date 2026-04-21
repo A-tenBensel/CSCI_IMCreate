@@ -100,7 +100,7 @@
           <button type="submit">Follow</button>
         </form>
         <div>{{ is_following }}</div>
-        <form class="post_form" method="POST" action="{% url 'front_page' %}">
+        <form class="post_form" method="POST" action="{% url 'block_user' post.user.profile.slug %}">
           {% csrf_token %}
           <button type="submit">Block</button>
         </form>
