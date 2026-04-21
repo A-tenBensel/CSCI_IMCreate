@@ -123,7 +123,7 @@
         </svg>
         </button>
       </form>
-      <form method="POST" action="{% url 'front_page' %}">
+      <form method="POST" action="{% url 'comment' post_id=post.id%}">
         {% csrf_token %}
         <button type="submit">
           <svg viewBox="0 0 24 24" height="20px" width="auto">
@@ -132,9 +132,24 @@
         </button>
       </form>
     </div>
-    <a href="{% url 'front_page' %}" class="post_link">
+    <a href="{% url 'view_post' post_id=post.id %}" class="post_link">
       <div><b>{{ post.title }}</b></div>
       <div class= "post_desc">{{ post.description }}</div>
     </a>
   </div>
+  {% if comment_form %}
+  {% include "components/form.html" with form=comment_form %}
+  {% for comment in post.replies.all %}
+  <div>
+    <div class="user">
+    {% if comment.user.profile.profile_pic %}
+      <img class="user_profile" src="{{ comment.user.profile.profile_pic.url }}">
+    {% endif %}  
+    <div>{{ comment.user.profile.display_name }}</div>
+    </div>
+    <div>{{ comment.comment }}</div>
+  </div>
+    
+  {% endfor %}
+  {% endif %}
 </article>
