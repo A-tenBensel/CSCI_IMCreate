@@ -103,22 +103,25 @@
 </style>
 <article class="post_container">
   <div class="post_header">
-    <a href="{% url 'front_page' %}" class="user">
+    <a href="/{{ post.user.profile.slug }}" class="user">
       {% if post.user.profile.profile_pic %}
         <img class="user_profile" src="{{ post.user.profile.profile_pic.url }}" alt="{{ post.user.username }}'s profile picture">
         {% endif %}
         <div>{{ post.user.username }}</div>
     </a>
-    <div class="user_interactions">
-      <form class="post_form" method="POST" action="{% url 'front_page' %}">
-        {% csrf_token %}
-        <button type="submit">Follow</button>
-      </form>
-      <form class="post_form" method="POST" action="{% url 'front_page' %}">
-        {% csrf_token %}
-        <button type="submit">Block</button>
-      </form>
-    </div>
+    {% if not is_following %}
+      <div class="user_interactions">
+        <form class="post_form" method="POST" action="{% url 'follow_user' post.user.profile.slug %}">
+          {% csrf_token %}
+          <button type="submit">Follow</button>
+        </form>
+        <div>{{ is_following }}</div>
+        <form class="post_form" method="POST" action="{% url 'block_user' post.user.profile.slug %}">
+          {% csrf_token %}
+          <button type="submit">Block</button>
+        </form>
+      </div>
+    {% endif %}
   </div>
 
   <div>
@@ -149,7 +152,7 @@
         <span class="like_count" id="like-count-{{ post.id }}">{{ post.like_count }}</span>
       </div>
 
-      <form method="POST" action="{% url 'front_page' %}">
+      <form method="POST" action="{% url 'comment' post_id=post.id %}">
         {% csrf_token %}
         <button type="submit">
           <svg viewBox="0 0 24 24" height="20px" width="20px">
@@ -158,11 +161,27 @@
         </button>
       </form>
     </div>
-    <a href="{% url 'front_page' %}" class="post_link">
+    <a href="{% url 'view_post' post_id=post.id %}" class="post_link">
       <div><b>{{ post.title }}</b></div>
       <div class= "post_desc">{{ post.description }}</div>
     </a>
   </div>
+  {% if comment_form %}
+  {% include "components/form.html" with form=comment_form %}
+  {% for comment in post.replies.all %}
+  <div>
+    <div class="user">
+    {% if comment.user.profile.profile_pic %}
+      <img class="user_profile" src="{{ comment.user.profile.profile_pic.url }}">
+    {% endif %}  
+    <div>{{ comment.user.profile.display_name }}</div>
+    </div>
+    <div>{{ comment.comment }}</div>
+  </div>
+    
+  {% endfor %}
+  {% endif %}
+
   <script>
   function toggleLike(postId) {
     const countEl = document.getElementById(`like-count-${postId}`);

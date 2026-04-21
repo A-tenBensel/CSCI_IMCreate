@@ -17,8 +17,8 @@
         </div>
         <button type="submit">Search</button>
     </form>
-    {% for post in posts.object_list %}
-        {% include "components/post.html" with post=post %}
+    {% for post, is_following in posts.object_list %}
+        {% include "components/post.html" with post=post is_following=is_following %}
     {% endfor %}
     <div>
         {% if posts.has_previous %}
