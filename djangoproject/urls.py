@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('IMCreate.urls')),
     path('', include('apps.users.urls')),
-    # path('', include('apps.comments.urls')),
+    path('', include('apps.posts.urls')),
     # path('', include('apps.posts.urls')),
     # path('', include('apps.social.urls')),
 ]
