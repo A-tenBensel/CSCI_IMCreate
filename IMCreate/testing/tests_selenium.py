@@ -12,8 +12,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.firefox.options import Options
 
-STATIC_URL = "http://18.219.95.140:8000/"
+STATIC_URL = "http://3.17.12.41:8000/"
 WAIT_TIME = 3
+TEST_USER = 6 # increase every test
 
 class TestDefaultSuite():
   def setup_method(self, method):
@@ -27,7 +28,9 @@ class TestDefaultSuite():
     self.driver.quit()
   
   def test_createaccount(self):
+   # Requires testuser# to be unused
     file_path = os.path.abspath("IMCreate/testing/profilepic.jpg")
+    wait = WebDriverWait(self.driver, WAIT_TIME)
 
     # navigation
     self.driver.get(STATIC_URL)
@@ -38,7 +41,7 @@ class TestDefaultSuite():
 
     # username
     self.driver.find_element(By.ID, "id_username").click()
-    self.driver.find_element(By.ID, "id_username").send_keys("testuser2")
+    self.driver.find_element(By.ID, "id_username").send_keys(f"testuser{TEST_USER}")
     
     # password
     self.driver.find_element(By.ID, "id_password1").send_keys("userpass")
@@ -49,12 +52,11 @@ class TestDefaultSuite():
     self.driver.find_element(By.CSS_SELECTOR, "button").click()
 
     # wait
-    wait = WebDriverWait(self.driver, WAIT_TIME)
-    about_me_field = wait.until(EC.presence_of_element_located((By.ID, "id_about_me")))
-    about_me_field.click()
+    wait_field = wait.until(EC.presence_of_element_located((By.ID, "id_about_me")))
+    wait_field.click()
 
     # about me
-    self.driver.find_element(By.ID, "id_about_me").send_keys("this is a blurb about me")
+    self.driver.find_element(By.ID, "id_about_me").send_keys("This is a blurb about me.")
 
     # profile pic
     self.driver.find_element(By.ID, "id_profile_pic").send_keys(file_path)
@@ -63,15 +65,24 @@ class TestDefaultSuite():
     self.driver.find_element(By.CSS_SELECTOR, "button").click()
   
   def test_createpost(self):
+    # Requires valid testuser# and picture
     file_path = os.path.abspath("IMCreate/testing/furby.jpg")
 
     # navigation
     self.driver.get(STATIC_URL)
+    self.driver.find_element(By.LINK_TEXT, "Profile").click()
+    
+    # log in
+    self.driver.find_element(By.ID, "id_username").send_keys(f"testuser{TEST_USER}")
+    self.driver.find_element(By.ID, "id_password").send_keys("userpass")
+    self.driver.find_element(By.CSS_SELECTOR, "button:nth-child(4)").click()
+
+    # navigation
     self.driver.find_element(By.LINK_TEXT, "Make Post").click()
 
     # post title
     self.driver.find_element(By.ID, "id_title").click()
-    self.driver.find_element(By.ID, "id_title").send_keys("test post1")
+    self.driver.find_element(By.ID, "id_title").send_keys("test post")
     
     # post description
     self.driver.find_element(By.ID, "id_description").click()
@@ -86,46 +97,39 @@ class TestDefaultSuite():
     
     # submit
     self.driver.find_element(By.CSS_SELECTOR, "button").click()
-  
-  def test_editprofile(self):
-    file_path = os.path.abspath("IMCreate/testing/rabbit.jpg")
 
+  def test_block(self):
+    # Requires first post to not be blocked or followed
+    
     # navigation
     self.driver.get(STATIC_URL)
     self.driver.find_element(By.LINK_TEXT, "Profile").click()
     
-    # log in
-    self.driver.find_element(By.ID, "id_username").send_keys("testuser2")
+    # login
+    self.driver.find_element(By.ID, "id_username").send_keys(f"testuser{TEST_USER}")
+    self.driver.find_element(By.ID, "id_password").send_keys("userpass")
+    self.driver.find_element(By.ID, "id_password").send_keys(Keys.ENTER)
+
+    # block link
+    self.driver.find_element(By.LINK_TEXT, "Home").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".post_form:nth-child(2) > button").click()
+  
+  def test_follow(self):
+    # Requires first post on Home to not be previously followed
+
+    # navigation
+    self.driver.get(STATIC_URL)
+    self.driver.find_element(By.LINK_TEXT, "Profile").click()
+
+    # login
+    self.driver.find_element(By.ID, "id_username").click()
+    self.driver.find_element(By.ID, "id_username").send_keys(f"testuser{TEST_USER}")
     self.driver.find_element(By.ID, "id_password").send_keys("userpass")
     self.driver.find_element(By.CSS_SELECTOR, "button:nth-child(4)").click()
 
-    # change About Me
-    self.driver.find_element(By.ID, "id_about_me").click()
-    self.driver.find_element(By.ID, "id_about_me").send_keys("this is an edited about me")
-    
-    # change profile pic
-    self.driver.find_element(By.ID, "id_profile_pic").send_keys(file_path)
+    # follow link
+    self.driver.find_element(By.LINK_TEXT, "Home").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".content").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".post_form:nth-child(1) > button").click()
 
-    # submit
-    self.driver.find_element(By.CSS_SELECTOR, "button").click()
-  
-  def test_tagsearch(self):
-
-    #navigation
-    self.driver.get(STATIC_URL)
-    self.driver.find_element(By.ID, "tags").click()
-
-    # tag search
-    self.driver.find_element(By.ID, "tags").send_keys("first")
-    self.driver.find_element(By.ID, "tags").send_keys(Keys.ENTER)
-
-
-
-# wait = WebDriverWait(self.driver, WAIT_TIME)
-# id_display_field = wait.until(EC.presence_of_element_located((By.ID, "id_display_name")))
-# id_display_field.click()
-
-# wait = WebDriverWait(self.driver, 10)
-# name_element = wait.until(EC.presence_of_element_located((By.ID, "name")))
-# name_text = name_element.text print(f'name_text: {name_text}')
-# assert "Candice Batton" in name_text, f"Expected 'Candice Batton' in search results, but got '{name_text}'"
+ 
