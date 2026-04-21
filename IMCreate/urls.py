@@ -4,10 +4,14 @@ from apps.users import views as user_views
 from apps.comments import views as comment_views
 from apps.social import views as social_views
 from IMCreate import views
+from django.contrib import admin
 
 urlpatterns = [
-  path("",                    views.front_page,       name="front_page"),
-  path("account",             user_views.update_profile,   name="update_profile"),
-  path("make_post",           post_views.make_post,        name="make_post"),
-  path("post/<int:post_id>/", post_views.view_post,        name="view_post"),
+  path("admin/",                admin.site.urls                               ),
+  path("",                      views.front_page,            name="front_page"),
+  path("account",               user_views.update_profile,   name="update_profile"),
+  path("make_post",             post_views.make_post,        name="make_post"),
+  path("post/<int:post_id>/",   post_views.view_post,        name="view_post"),
+  path("like/<int:post_id>/",   post_views.like_post,        name="like_post"),
+  path("unlike/<int:post_id>/", post_views.unlike_post,      name="unlike_post")
 ]
