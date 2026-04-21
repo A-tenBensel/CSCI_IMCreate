@@ -6,4 +6,6 @@ urlpatterns = [
   path("login", UserAuthenticationView.as_view(), name="login_user"),
   path("account/", ProfileEditView.as_view(), name="user_account"),
   path("<slug:profile_slug>", ProfileView.as_view(), name="view_profile"),
+  path("follow/<slug:profile_slug>", follow_user, name="follow_user"),
+  path("block/<slug:profile_slug>", block_user, name="block_user"),
 ]

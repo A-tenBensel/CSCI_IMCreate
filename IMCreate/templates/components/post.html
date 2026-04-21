@@ -69,13 +69,12 @@
     border-color: #ff0000;
   }
   .post_interactions {
-    /* margin: 10px; */
-    display: flex;
-    gap: 20px;
-    /* border-color: white; */
-    /* border-width: 5px; */
-    /* border-style: solid; */
-  }
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+  padding-top: 4px;
+}
 
   .post_desc {
     display: -webkit-box;
@@ -84,25 +83,44 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  .like_group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .like_count {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    transform: translateY(1px);
+  }
+
+  button.liked .heart-shape {
+    fill: red !important;
+  }
 </style>
 <article class="post_container">
   <div class="post_header">
-    <a href="{% url 'front_page' %}" class="user">
+    <a href="/{{ post.user.profile.slug }}" class="user">
       {% if post.user.profile.profile_pic %}
         <img class="user_profile" src="{{ post.user.profile.profile_pic.url }}" alt="{{ post.user.username }}'s profile picture">
         {% endif %}
         <div>{{ post.user.username }}</div>
     </a>
-    <div class="user_interactions">
-      <form class="post_form" method="POST" action="{% url 'front_page' %}">
-        {% csrf_token %}
-        <button type="submit">Follow</button>
-      </form>
-      <form class="post_form" method="POST" action="{% url 'front_page' %}">
-        {% csrf_token %}
-        <button type="submit">Block</button>
-      </form>
-    </div>
+    {% if not is_following %}
+      <div class="user_interactions">
+        <form class="post_form" method="POST" action="{% url 'follow_user' post.user.profile.slug %}">
+          {% csrf_token %}
+          <button type="submit">Follow</button>
+        </form>
+        <form class="post_form" method="POST" action="{% url 'block_user' post.user.profile.slug %}">
+          {% csrf_token %}
+          <button type="submit">Block</button>
+        </form>
+      </div>
+    {% endif %}
   </div>
 
   <div>
@@ -112,26 +130,79 @@
       {% endfor %}
     </a>
     <div class="post_interactions">
-      <form method="POST" action="{% url 'front_page' %}">
-        {% csrf_token %}
-        <button type="submit">
-          <svg viewBox="0 0 490 490" height="20px" width="auto">
-          <path d="M140 20C73 20 20 74 20 140c0 135 136 170 228 303 88-132 229-173 229-303 0-66-54-120-120-120-48 0-90 28-109 69-19-41-60-69-108-69z" stroke="white" fill="transparent" stroke-width="30"></path>
-        </svg>
+      <div class="like_group">
+        <button
+          id="like-btn-{{ post.id }}"
+          class="{% if post.id in liked_posts %}liked{% endif %}"
+          type="button"
+          onclick="toggleLike('{{ post.id }}')"
+        >
+          <svg viewBox="0 0 490 490" height="20px" width="20px">
+            <path
+              class="heart-shape"
+              d="M140 20C73 20 20 74 20 140c0 135 136 170 228 303 88-132 229-173 229-303 0-66-54-120-120-120-48 0-90 28-109 69-19-41-60-69-108-69z"
+              stroke="white"
+              fill="none"
+              stroke-width="30">
+            </path>
+          </svg>
         </button>
-      </form>
-      <form method="POST" action="{% url 'front_page' %}">
+
+        <span class="like_count" id="like-count-{{ post.id }}">{{ post.like_count }}</span>
+      </div>
+
+      <form method="POST" action="{% url 'comment' post_id=post.id %}">
         {% csrf_token %}
         <button type="submit">
-          <svg viewBox="0 0 24 24" height="20px" width="auto">
+          <svg viewBox="0 0 24 24" height="20px" width="20px">
             <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" stroke="white" fill="transparent" stroke-width="2"></path>
           </svg>
         </button>
       </form>
     </div>
-    <a href="{% url 'front_page' %}" class="post_link">
+    <a href="{% url 'view_post' post_id=post.id %}" class="post_link">
       <div><b>{{ post.title }}</b></div>
       <div class= "post_desc">{{ post.description }}</div>
     </a>
   </div>
+  {% if comment_form %}
+  {% include "components/form.html" with form=comment_form %}
+  {% for comment in post.replies.all %}
+  <div>
+    <div class="user">
+    {% if comment.user.profile.profile_pic %}
+      <img class="user_profile" src="{{ comment.user.profile.profile_pic.url }}">
+    {% endif %}  
+    <div>{{ comment.user.profile.display_name }}</div>
+    </div>
+    <div>{{ comment.comment }}</div>
+  </div>
+    
+  {% endfor %}
+  {% endif %}
+
+  <script>
+  function toggleLike(postId) {
+    const countEl = document.getElementById(`like-count-${postId}`);
+    const btn = document.getElementById(`like-btn-${postId}`);
+    const heart = btn.querySelector('.heart-shape');
+
+    const isLiked = btn.classList.contains("liked");
+    const url = isLiked ? `/unlike/${postId}/` : `/like/${postId}/`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        countEl.innerText = data.count;
+
+        if (isLiked) {
+          btn.classList.remove("liked");
+          heart.setAttribute("fill", "none");   // 👈 THIS FIXES IT
+        } else {
+          btn.classList.add("liked");
+          heart.setAttribute("fill", "red");    // 👈 THIS FIXES IT
+        }
+      });
+  }
+  </script>
 </article>

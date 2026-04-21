@@ -5,7 +5,7 @@
 {% if profile.profile_pic %}
 <img src="{{ profile.profile_pic.url }}">
 {% for post in profile.user.posts.all %}
-{% include 'components/post.html' with post=post %}
+{% include 'components/post.html' with post=post is_following=True %}
 {% endfor %}
 {% endif %}
 {% endblock %}
