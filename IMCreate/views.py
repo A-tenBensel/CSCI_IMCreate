@@ -2,6 +2,7 @@ from django.contrib.auth import login
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from apps.posts.models import Post
+from apps.social.models import Follower
 
 def front_page(request):
   tags = request.GET.get("tags","").strip()
@@ -14,5 +15,9 @@ def front_page(request):
     posts = Post.objects.all()
   
   posts = posts.order_by("upload_date")
-  
-  return render(request,'index.html',{'posts':posts, "tags_query": tags})
+  if request.user.is_authenticated:
+    following = request.user.following.all()
+    is_following = [following.filter(following=post.user).exists() for post in posts]
+  else:
+    is_following = [False for _ in posts]
+  return render(request,'index.html',{'posts':zip(posts, is_following), "tags_query": tags})

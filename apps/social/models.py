@@ -26,8 +26,8 @@ class Follower(models.Model):
     follower: User that is following.
     notifications: If the follower gets notifs when following posts.
     """
-    following = models.ForeignKey(User, on_delete = models.CASCADE, related_name='following')
-    follower = models.ForeignKey(User, on_delete = models.CASCADE, related_name='follower')
+    following = models.ForeignKey(User, on_delete = models.CASCADE, related_name='followers')
+    follower = models.ForeignKey(User, on_delete = models.CASCADE, related_name='following')
     notifications = models.BooleanField(default = True)
     class Meta:
       constraints = [models.UniqueConstraint(fields=['follower', "following"], name = 'unique_follow')]

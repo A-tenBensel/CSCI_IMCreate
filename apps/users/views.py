@@ -10,12 +10,13 @@ from IMCreate.forms.forms import ProfileForm
 from IMCreate.forms.render import RenderForm
 from IMCreate.render import RenderUserCreationForm, RenderAuthenticationForm
 from .models import Profile
+from apps.social.models import Follower
 
 class ProfileEditView(UserPassesTestMixin, UpdateView):
   model = Profile
   form_class = ProfileForm
   template_name = 'profile_edit.html'
-  success_url = reverse_lazy('view_profile')
+  success_url = reverse_lazy('user_account')
   # slug_url_kwarg = "user_slug"
   login_url = "login_user"
   redirect_field_name = None
@@ -88,3 +89,12 @@ def update_profile(request):
     return redirect("login_user")
   print(request.user.profile.profile_pic)
   return RenderForm(request, ProfileForm, view='account.html', form_kwargs={"instance": request.user.profile}).render
+
+def follow_user(request, profile_slug):
+  try:
+    following = Profile.objects.get(slug=profile_slug)
+    follower = request.user
+    Follower.objects.create(following=following.user, follower=follower, notifications = True)
+    return redirect(following.slug)
+  except:
+    return redirect("sign_up")

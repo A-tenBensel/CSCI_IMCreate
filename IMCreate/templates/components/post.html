@@ -87,22 +87,25 @@
 </style>
 <article class="post_container">
   <div class="post_header">
-    <a href="{% url 'front_page' %}" class="user">
+    <a href="/{{ post.user.profile.slug }}" class="user">
       {% if post.user.profile.profile_pic %}
         <img class="user_profile" src="{{ post.user.profile.profile_pic.url }}" alt="{{ post.user.username }}'s profile picture">
         {% endif %}
         <div>{{ post.user.username }}</div>
     </a>
-    <div class="user_interactions">
-      <form class="post_form" method="POST" action="{% url 'front_page' %}">
-        {% csrf_token %}
-        <button type="submit">Follow</button>
-      </form>
-      <form class="post_form" method="POST" action="{% url 'front_page' %}">
-        {% csrf_token %}
-        <button type="submit">Block</button>
-      </form>
-    </div>
+    {% if not is_following %}
+      <div class="user_interactions">
+        <form class="post_form" method="POST" action="{% url 'follow_user' post.user.profile.slug %}">
+          {% csrf_token %}
+          <button type="submit">Follow</button>
+        </form>
+        <div>{{ is_following }}</div>
+        <form class="post_form" method="POST" action="{% url 'front_page' %}">
+          {% csrf_token %}
+          <button type="submit">Block</button>
+        </form>
+      </div>
+    {% endif %}
   </div>
 
   <div>
