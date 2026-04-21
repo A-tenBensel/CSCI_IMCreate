@@ -2,7 +2,7 @@ from django.contrib.auth import login
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
 from apps.posts.models import Post
-from apps.social.models import Follower, Blocked
+from apps.social.models import Like, Follower, Blocked
 
 def front_page(request):
   tags = request.GET.get("tags","").strip()
@@ -10,7 +10,6 @@ def front_page(request):
   if tags:
     tagsList = [t.strip() for t in tags.split(',') if t.strip()]
     posts = Post.objects.filter(tags__name__in=tagsList).distinct()
-
   else:
     posts = Post.objects.all()
 

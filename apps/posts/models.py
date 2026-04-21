@@ -25,6 +25,7 @@ class Post(models.Model):
   title = models.CharField(max_length = 255)
   description = models.TextField(max_length = 1000)
   tags = TaggableManager()
+  like_count = models.IntegerField(default=0)
 
 class Post_Image(models.Model):
   post = models.ForeignKey(Post, related_name="images", on_delete=models.CASCADE)
