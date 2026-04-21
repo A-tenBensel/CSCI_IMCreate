@@ -28,7 +28,7 @@ def front_page(request):
     is_following = [following.filter(following=post.user).exists() for post in posts]
   else:
     is_following = [False for _ in posts]
-  posts = zip(posts, is_following)
+  posts = list(zip(posts, is_following))
   
   paginator = Paginator(posts, 2)
   pageNumber = request.GET.get("page",1)

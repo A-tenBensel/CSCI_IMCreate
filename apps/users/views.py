@@ -95,7 +95,7 @@ def follow_user(request, profile_slug):
     following = Profile.objects.get(slug=profile_slug)
     follower = request.user
     Follower.objects.create(following=following.user, follower=follower, notifications = True)
-    return redirect(following.slug)
+    return redirect("view_profile", profile_slug = following.slug)
   except:
     return redirect("sign_up")
   
@@ -104,6 +104,6 @@ def block_user(request, profile_slug):
     blocking = Profile.objects.get(slug=profile_slug)
     blocker = request.user
     Blocked.objects.create(blocked_user=blocking.user, blocker=blocker)
-    return redirect(blocking.slug)
+    return redirect("")
   except:
     return redirect("sign_up")
